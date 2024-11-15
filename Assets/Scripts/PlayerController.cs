@@ -8,22 +8,21 @@ public enum Controls { mobile,pc}
 
 public class PlayerController : MonoBehaviour
 {
-
-
     public float moveSpeed = 5f;
     public float jumpForce = 10f;
     public float doubleJumpForce = 8f;
     public LayerMask groundLayer;
     public Transform groundCheck;
-
-    private Rigidbody2D rb;
-    private bool isGroundedBool = false;
+    //------------------------------------------------------------------------------------------------------public PARA EL TEST
+    public Rigidbody2D rb;
+    //------------------------------------------------------------------------------------------------------public PARA EL TEST
+    public bool isGroundedBool = false;
     private bool canDoubleJump = false;
 
     public Animator playeranim;
 
     public Controls controlmode;
-   
+
 
     private float moveX;
     public bool isPaused = false;
@@ -35,14 +34,14 @@ public class PlayerController : MonoBehaviour
     private bool wasonGround;
 
 
-   // public GameObject projectile;
-   // public Transform firePoint;
+    // public GameObject projectile;
+    // public Transform firePoint;
 
     public float fireRate = 0.5f; // Time between each shot
     private float nextFireTime = 0f; // Time of the next allowed shot
 
 
-    
+
 
 
 
@@ -57,6 +56,14 @@ public class PlayerController : MonoBehaviour
             UIManager.instance.EnableMobileControls();
         }
 
+
+
+        playeranim = transform.Find("sr").GetComponent<Animator>();
+
+        if (playeranim == null)
+        {
+            Debug.LogError("No se encontró el componente Animator en el objeto hijo 'sr'.");
+        }
 
     }
 
@@ -90,12 +97,17 @@ public class PlayerController : MonoBehaviour
 
         if (!isPaused)
         {
+
+            //------------------------------------------------------------------------------------------------------COMENTADO PARA EL TEST
+
             // Calculate rotation angle based on mouse position
-            Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            Vector3 lookDirection = mousePosition - transform.position;
-            float angle = Mathf.Atan2(lookDirection.y, lookDirection.x) * Mathf.Rad2Deg;
+            //Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            //Vector3 lookDirection = mousePosition - transform.position;
+            //float angle = Mathf.Atan2(lookDirection.y, lookDirection.x) * Mathf.Rad2Deg;
 
             // ... (your existing code for rotation)
+
+            //------------------------------------------------------------------------------------------------------COMENTADO PARA EL TEST
 
             // Handle shooting
             if (controlmode == Controls.pc && Input.GetButtonDown("Fire1") && Time.time >= nextFireTime)
@@ -106,6 +118,7 @@ public class PlayerController : MonoBehaviour
         }
         SetAnimations();
 
+
         if (moveX != 0)
         {
             FlipSprite(moveX);
@@ -113,33 +126,35 @@ public class PlayerController : MonoBehaviour
 
         //impactEffect
 
-        if(!wasonGround && isGroundedBool)
+        if (!wasonGround && isGroundedBool)
         {
             ImpactEffect.gameObject.SetActive(true);
             ImpactEffect.Stop();
-            ImpactEffect.transform.position = new Vector2(footsteps.transform.position.x,footsteps.transform.position.y-0.2f);
+            ImpactEffect.transform.position = new Vector2(footsteps.transform.position.x, footsteps.transform.position.y - 0.2f);
             ImpactEffect.Play();
         }
 
         wasonGround = isGroundedBool;
 
-        
+
     }
     public void SetAnimations()
     {
         if (moveX != 0 && isGroundedBool)
         {
             playeranim.SetBool("run", true);
-            footEmissions.rateOverTime= 35f;
+            footEmissions.rateOverTime = 35f;
         }
         else
         {
-            playeranim.SetBool("run",false);
+            playeranim.SetBool("run", false);
             footEmissions.rateOverTime = 0f;
         }
 
+
         playeranim.SetBool("isGrounded", isGroundedBool);
-       
+
+
     }
 
     private void FlipSprite(float direction)
@@ -157,25 +172,33 @@ public class PlayerController : MonoBehaviour
     }
     private void FixedUpdate()
     {
+        MovePlayer();
+    }
+
+    public void MovePlayer()
+    {
         // Player movement
         if (controlmode == Controls.pc)
         {
             moveX = Input.GetAxis("Horizontal");
         }
-       
+
 
 
         rb.velocity = new Vector2(moveX * moveSpeed, rb.velocity.y);
     }
 
-    private void Jump(float jumpForce)
+    //------------------------------------------------------------------------------------------------------ public PARA EL TEST
+    public void Jump(float jumpForce) //SE PUSO PUBLICA LA FUNCION PARA EL TEST
     {
         rb.velocity = new Vector2(rb.velocity.x, 0); // Zero out vertical velocity
         rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
         playeranim.SetTrigger("jump");
     }
+    //------------------------------------------------------------------------------------------------------public PARA EL TEST
 
-    private bool IsGrounded()
+
+    public bool IsGrounded()
     {
         float rayLength = 0.25f;
         Vector2 rayOrigin = new Vector2(groundCheck.transform.position.x, groundCheck.transform.position.y - 0.1f);
@@ -184,12 +207,11 @@ public class PlayerController : MonoBehaviour
     }
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if(collision.gameObject.tag == "killzone")
+        if (collision.gameObject.tag == "killzone")
         {
             GameManager.instance.Death();
         }
     }
-    
 
 
 
