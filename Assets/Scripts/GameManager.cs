@@ -12,9 +12,9 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] private PlayerController playerController;
 
-    private int coinCount = 0;
+    public int coinCount = 0;
     private int gemCount = 0;
-    private bool isGameOver = false;
+    public bool isGameOver = false;
     private Vector3 playerPosition;
 
     //Level Complete
@@ -40,11 +40,11 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        UpdateGUI();
-        UIManager.instance.fadeFromBlack = true;
-        playerPosition = playerController.transform.position;
+        //UpdateGUI();
+        //UIManager.instance.fadeFromBlack = true;
+       // playerPosition = playerController.transform.position;
 
-        FindTotalPickups();
+       // FindTotalPickups();
     }
 
     public void IncrementCoinCount()
@@ -69,15 +69,15 @@ public class GameManager : MonoBehaviour
         if (!isGameOver)
         {
             // Disable Mobile Controls
-            UIManager.instance.DisableMobileControls();
+            //UIManager.instance.DisableMobileControls();
             // Initiate screen fade
-            UIManager.instance.fadeToBlack = true;
+            //UIManager.instance.fadeToBlack = true;
 
             // Disable the player object
-            playerController.gameObject.SetActive(false);
+            //playerController.gameObject.SetActive(false);
 
             // Start death coroutine to wait and then respawn the player
-            StartCoroutine(DeathCoroutine());
+            //StartCoroutine(DeathCoroutine());
 
             // Update game state
             isGameOver = true;

@@ -19,12 +19,14 @@ public class PlayerController : MonoBehaviour
     public bool isGroundedBool = false;
     private bool canDoubleJump = false;
 
+
     public Animator playeranim;
 
     public Controls controlmode;
 
+    public float moveX;
+    public float testMoveX = 0f; // Para pruebas
 
-    private float moveX;
     public bool isPaused = false;
 
     public ParticleSystem footsteps;
@@ -173,18 +175,12 @@ public class PlayerController : MonoBehaviour
     private void FixedUpdate()
     {
         MovePlayer();
+
     }
 
     public void MovePlayer()
     {
-        // Player movement
-        if (controlmode == Controls.pc)
-        {
-            moveX = Input.GetAxis("Horizontal");
-        }
-
-
-
+        float moveX = testMoveX != 0f ? testMoveX : Input.GetAxis("Horizontal");
         rb.velocity = new Vector2(moveX * moveSpeed, rb.velocity.y);
     }
 

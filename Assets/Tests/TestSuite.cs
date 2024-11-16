@@ -6,34 +6,116 @@ using UnityEngine.TestTools;
 
 public class TestSuite
 {
-    private PlayerController player;
-    private GameObject prefab;
+    private PlayerController playerController;
+    private GameObject player;
+
+    private GameManager gameManager;
+    private GameObject killZone;
+
+    private GameObject camera;
 
     [SetUp]
     public void Setup()
     {
         // Instancia el prefab del jugador desde Resources
-        prefab = UnityEngine.Object.Instantiate(Resources.Load<GameObject>("Prefabs/Player"));
-        player = prefab.GetComponent<PlayerController>();
+        player = UnityEngine.Object.Instantiate(Resources.Load<GameObject>("Prefabs/Player"));
+        playerController = player.GetComponent<PlayerController>();
 
         // Inicializa otros componentes necesarios
-        player.rb = player.GetComponent<Rigidbody2D>();
-        player.groundCheck = player.transform;
-        player.groundLayer = LayerMask.GetMask("Ground");
+        playerController.rb = playerController.GetComponent<Rigidbody2D>();
+        playerController.groundCheck = playerController.transform;
+        playerController.groundLayer = LayerMask.GetMask("Ground");
+
+        // Configurar valores predeterminados
+        playerController.moveSpeed = 5f;
+
+        // Objeto de zona de muerte
+        gameManager = new GameObject().AddComponent<GameManager>();
+        killZone = new GameObject();
+        killZone.AddComponent<BoxCollider2D>();
+        killZone.tag = "killzone";
+
+        camera = new GameObject("camera");
+        camera.AddComponent<Camera>();
+        camera.transform.position = new Vector3(-3, 4, -10);
+
+        //player.GetComponent<BoxCollider2D>().isTrigger = true;
     }
 
     [UnityTest]
     public IEnumerator PlayerJumpTest()
     {
-        float initialYPosition = player.transform.position.y;
+
+        player.transform.position = new Vector3(0, 5, -1);
+
+        float initialYPosition = playerController.transform.position.y;
 
         // Llama al método de salto
-        player.Jump(player.jumpForce);
+        playerController.Jump(playerController.jumpForce);
 
         // Espera un frame para permitir la simulación
-        yield return new WaitForSeconds(0.1f);
+        yield return new WaitForSeconds(0.2f);
 
         //Verifica que la posicion de y sea mayor a la inicial
-        Assert.Greater(player.transform.position.y, initialYPosition, "El jugador debería saltar");
+        Assert.Greater(playerController.transform.position.y, initialYPosition, "El jugador debería saltar");
     }
+
+    [UnityTest]
+    public IEnumerator PlayerMoveRightTest()
+    {
+        player.transform.position = new Vector3(0, 5, -1);
+        // Posición inicial
+        Vector3 initialPosition = playerController.transform.position;
+
+        // Configurar las variables necesarias
+        playerController.moveSpeed = 5f; // Ajusta la velocidad para pruebas
+
+        // Simula la entrada
+        playerController.testMoveX = 1f; // Movimiento hacia la derecha
+
+        // Llama al método de movimiento
+        playerController.MovePlayer();
+
+        // Espera un frame
+        yield return new WaitForSeconds(2f);
+
+        // Comprueba que el jugador se haya movido hacia la derecha
+        Assert.Greater(playerController.transform.position.x, initialPosition.x, "El jugador debería haberse movido hacia la derecha.");
+    }
+
+    [UnityTest]
+    public IEnumerator PlayerMoveLeftTest()
+    {
+        player.transform.position = new Vector3(0, 5, -1);
+        // Posición inicial
+        Vector3 initialPosition = playerController.transform.position;
+
+        // Configurar las variables necesarias
+        playerController.moveSpeed = 5f; // Ajusta la velocidad para pruebas
+
+        // Simula la entrada
+        playerController.testMoveX = -1f; // Movimiento hacia la izquierda
+
+        // Llama al método de movimiento
+        playerController.MovePlayer();
+
+        // Espera un frame
+        yield return new WaitForSeconds(2f);
+
+        // Comprueba que el jugador se haya movido hacia la izquierda
+        Assert.Less(playerController.transform.position.x, initialPosition.x, "El jugador debería haberse movido hacia la izquierda.");
+    }
+
+    [UnityTest]
+    public IEnumerator GameOverDetection()
+    {
+        player.transform.position = new Vector3(0,5,-1);
+        killZone.transform.position = new Vector3(0,0,0);
+
+        yield return new WaitForSeconds(1f);
+
+        Assert.IsTrue(gameManager.isGameOver, "El jugador deberia haberse muerto sangrientamente");
+    }
+
+
 }
